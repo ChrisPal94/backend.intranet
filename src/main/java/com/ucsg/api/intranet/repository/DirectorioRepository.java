@@ -1,0 +1,41 @@
+package com.ucsg.api.intranet.repository;
+
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import com.ucsg.api.intranet.model.DirectorioPersona;
+
+import java.util.List;
+
+@Repository
+public interface DirectorioRepository extends JpaRepository<DirectorioPersona, Integer> {
+
+    @Query(value = "SELECT DISTINCT COD_UNIDAD, COD_SUBUNIDAD_PADRE, SUBUNIDAD_PADRE, COD_SUBUNIDAD, SUBUNIDAD " +
+                   "FROM CALLCENTER.SCT_DIRECTORIO ORDER BY 1, 2, 3", nativeQuery = true)
+    List<DirectorioPersona> findAllPlano();
+
+    // --- NUEVO MÉTODO PARA LOS CONTACTOS (Sin afectar el anterior) ---
+    @Query(value = "SELECT DISTINCT EXTENSION, TITULO_PROFESIONAL, APELLIDOS, NOMBRES, " +
+                   "SUBUNIDAD_PADRE, SUBUNIDAD, CARGO, CORREO, EMPLEADO, ORDEN_SUBUNIDAD, COD_SUBUNIDAD " +
+                   "FROM CALLCENTER.SCT_DIRECTORIO " +
+                   "WHERE COD_UNIDAD = ?1 AND COD_SUBUNIDAD_PADRE = ?2 " +
+                   "ORDER BY ORDEN_SUBUNIDAD", nativeQuery = true)
+    List<Object[]> findContactosNative(Integer codUnidad, Integer codSubunidadPadre);
+
+    @Query(value = "SELECT DISTINCT EXTENSION, TITULO_PROFESIONAL, APELLIDOS, NOMBRES, " +
+               "SUBUNIDAD_PADRE, SUBUNIDAD, CARGO, CORREO, EMPLEADO, ORDEN_SUBUNIDAD, COD_SUBUNIDAD " +
+               "FROM CALLCENTER.SCT_DIRECTORIO " +
+               "WHERE COD_UNIDAD = ?1 " +
+               "AND COD_SUBUNIDAD_PADRE = ?2 " +
+               "AND COD_SUBUNIDAD = ?3 " +
+               "ORDER BY ORDEN_SUBUNIDAD", nativeQuery = true)
+List<Object[]> findContactosConHijaNative(Integer unidad, Integer padre, Integer hija);
+
+    @Query(value = "SELECT DISTINCT EXTENSION, TITULO_PROFESIONAL, APELLIDOS, NOMBRES, " +
+               "SUBUNIDAD_PADRE, SUBUNIDAD, CARGO, CORREO, EMPLEADO, ORDEN_SUBUNIDAD, COD_SUBUNIDAD " +
+               "FROM CALLCENTER.SCT_DIRECTORIO " +
+               "ORDER BY ORDEN_SUBUNIDAD", nativeQuery = true)
+List<Object[]> findAllContactosNative();
+}
